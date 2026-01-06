@@ -1,116 +1,25 @@
+---
 export const prerender = false;
----
-/**
- * Public Profile Page
- * Route: /@username
- * Role: READTalk public identity (SSR)
- */
 
-import BaseHead from "../components/BaseHead.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
-
-// ambil username dari URL
 const { username } = Astro.params;
-
-// sementara: mock fetch (nanti ganti DO API)
-const profile = {
-  username,
-  displayName: "READTalk Official",
-  bio: "Read to talk. Talk to trust.",
-  avatarUrl: "/favicon.svg",
-  links: [
-    { label: "Website", url: "https://readtalk.workers.dev" },
-    { label: "GitHub", url: "https://github.com/readtalk" }
-  ]
-};
 ---
+
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <BaseHead
-      title={`${profile.displayName} (@${profile.username})`}
-      description={profile.bio}
-    />
-  </head>
+<head>
+  <title>@{username} — READTalk</title>
+  <meta name="robots" content="index, follow" />
+</head>
 
-  <body>
-    <Header />
+<body>
+  <main style="max-width:640px;margin:3rem auto;font-family:system-ui">
+    <h1>@{username}</h1>
+    <p>Public identity on READTalk</p>
 
-    <main class="profile-container">
-      <section class="profile-card">
-        <img
-          src={profile.avatarUrl}
-          alt={profile.displayName}
-          class="avatar"
-        />
-
-        <h1>{profile.displayName}</h1>
-        <p class="username">@{profile.username}</p>
-
-        {profile.bio && <p class="bio">{profile.bio}</p>}
-
-        <div class="links">
-          {profile.links.map((link) => (
-            <a
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="link-button"
-            >
-              {link.label}
-            </a>
-          ))}
-        </div>
-      </section>
-    </main>
-
-    <Footer />
-  </body>
+    <section style="margin-top:2rem">
+      <h3>Status</h3>
+      <p>This profile is rendered via SSR.</p>
+    </section>
+  </main>
+</body>
 </html>
-
-<style>
-.profile-container {
-  min-height: 70vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.profile-card {
-  max-width: 420px;
-  width: 100%;
-  padding: 2rem;
-  text-align: center;
-}
-
-.avatar {
-  width: 96px;
-  height: 96px;
-  border-radius: 50%;
-  margin-bottom: 1rem;
-}
-
-.username {
-  opacity: 0.6;
-  margin-bottom: 0.75rem;
-}
-
-.bio {
-  margin-bottom: 1.5rem;
-}
-
-.links {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.link-button {
-  display: block;
-  padding: 0.75rem 1rem;
-  border-radius: 999px;
-  text-decoration: none;
-  border: 1px solid currentColor;
-}
-</style>
