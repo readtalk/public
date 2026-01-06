@@ -2,24 +2,120 @@
 export const prerender = false;
 
 const { username } = Astro.params;
+
+const res = await fetch(
+  `https://social.readtalk.workers.dev/api/profile/${username}`
+);
+
+if (!res.ok) {
+  return new Response("Profile not found", { status: 404 });
+}
+
+const p = await res.json();
 ---
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>@{username} — READTalk</title>
+  <meta charset="utf-8" />
+  <title>@{p.username} — READTalk</title>
+  <meta name="description" content={p.bio} />
   <meta name="robots" content="index, follow" />
 </head>
 
 <body>
-  <main style="max-width:640px;margin:3rem auto;font-family:system-ui">
-    <h1>@{username}</h1>
-    <p>Public identity on READTalk</p>
+  <main class="profile">
 
-    <section style="margin-top:2rem">
-      <h3>Status</h3>
-      <p>This profile is rendered via SSR.</p>
+    <header>
+      <div class="avatar">
+        {p.avatar
+          ? <img src={p.avatar} alt={`@${p.username}`} />
+          : <div class="avatar-fallback">@</div>
+        }
+      </div>
+
+      <h1>@{p.username}</h1>
+      <p class="display-name">{p.displayName}</p>
+      <p class="bio">{p.bio}</p>
+    </header>
+
+    <section class="links">
+      {p.links.map(link => (
+        <a
+          class="link"
+          href={link.url}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {link.label}
+        </a>
+      ))}
     </section>
+
+    <footer>
+      <small>
+        Public identity on <strong>READTalk</strong><br />
+        “Talk to Trust”
+      </small>
+    </footer>
+
   </main>
 </body>
 </html>
+
+<style>
+.profile {
+  max-width: 420px;
+  margin: 3rem auto;
+  padding: 1rem;
+  font-family: system-ui;
+  text-align: center;
+}
+
+.avatar {
+  width: 96px;
+  height: 96px;
+  margin: 0 auto;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #eee;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-fallback {
+  font-size: 3rem;
+  line-height: 96px;
+}
+
+.display-name {
+  font-weight: 600;
+}
+
+.bio {
+  opacity: 0.8;
+  margin-bottom: 2rem;
+}
+
+.links {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.link {
+  display: block;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.link:hover {
+  background: #f5f5f5;
+}
+</style>
