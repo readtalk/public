@@ -1,121 +1,59 @@
 ---
+/**
+ * READTalk Public Profile Page
+ * Route: /@username
+ * Mode: SSR (Cloudflare Workers)
+ */
+
 export const prerender = false;
+
+import CopyProfile from "../components/CopyProfile.jsx";
 
 const { username } = Astro.params;
 
-const res = await fetch(
-  `https://social.readtalk.workers.dev/api/profile/${username}`
-);
-
-if (!res.ok) {
-  return new Response("Profile not found", { status: 404 });
-}
-
-const p = await res.json();
+// nanti fetch ke Durable Object di sini
+// const profile = await fetchProfile(username);
 ---
 
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>@{p.username} — READTalk</title>
-  <meta name="description" content={p.bio} />
-  <meta name="robots" content="index, follow" />
-</head>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<body>
-  <main class="profile">
+    <title>@{username} · READTalk</title>
 
-    <header>
-      <div class="avatar">
-        {p.avatar
-          ? <img src={p.avatar} alt={`@${p.username}`} />
-          : <div class="avatar-fallback">@</div>
-        }
-      </div>
+    <meta name="description" content={`Profil publik @${username} di READTalk`} />
+    <meta name="robots" content="index, follow" />
 
-      <h1>@{p.username}</h1>
-      <p class="display-name">{p.displayName}</p>
-      <p class="bio">{p.bio}</p>
-    </header>
+    <!-- Open Graph -->
+    <meta property="og:title" content={`@${username} · READTalk`} />
+    <meta property="og:type" content="profile" />
+    <meta property="og:url" content={`https://social.readtalk.workers.dev/@${username}`} />
+  </head>
 
-    <section class="links">
-      {p.links.map(link => (
-        <a
-          class="link"
-          href={link.url}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {link.label}
-        </a>
-      ))}
-    </section>
+  <body>
+    <main style="max-width: 720px; margin: 0 auto; padding: 2rem;">
+      <!-- IDENTITAS -->
+      <section>
+        <h1 style="margin-bottom: 0.25rem;">@{username}</h1>
+        <p style="opacity: 0.7; margin-top: 0;">
+          Public identity · READTalk
+        </p>
+      </section>
 
-    <footer>
-      <small>
-        Public identity on <strong>READTalk</strong><br />
-        “Talk to Trust”
-      </small>
-    </footer>
+      <!-- ACTION -->
+      <section style="margin-top: 1.5rem;">
+        <CopyProfile client:idle />
+      </section>
 
-  </main>
-</body>
+      <!-- PLACEHOLDER BIO -->
+      <section style="margin-top: 2rem;">
+        <p>
+          Ini adalah halaman identitas publik READTalk.
+          Konten bersifat terbuka dan dapat diindeks mesin pencari.
+        </p>
+      </section>
+    </main>
+  </body>
 </html>
-
-<style>
-.profile {
-  max-width: 420px;
-  margin: 3rem auto;
-  padding: 1rem;
-  font-family: system-ui;
-  text-align: center;
-}
-
-.avatar {
-  width: 96px;
-  height: 96px;
-  margin: 0 auto;
-  border-radius: 50%;
-  overflow: hidden;
-  background: #eee;
-}
-
-.avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.avatar-fallback {
-  font-size: 3rem;
-  line-height: 96px;
-}
-
-.display-name {
-  font-weight: 600;
-}
-
-.bio {
-  opacity: 0.8;
-  margin-bottom: 2rem;
-}
-
-.links {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.link {
-  display: block;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  text-decoration: none;
-  color: inherit;
-}
-
-.link:hover {
-  background: #f5f5f5;
-}
-</style>
